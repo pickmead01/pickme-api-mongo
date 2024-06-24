@@ -21,17 +21,6 @@ const PORT = process.env.PORT || 3000;
 // const CorsOrgin
 // const corsOrgin = process.env.CORS_STR || "http://localhost:4200";
 // const ssl
-const ssl = https.createServer(
-  {
-    key: fs.readFileSync("/etc/letsencrypt/live/bd.musense.tw/privkey.pem", {
-      encoding: "utf8",
-    }),
-    cert: fs.readFileSync("/etc/letsencrypt/live/bd.musense.tw/fullchain.pem", {
-      encoding: "utf8",
-    }),
-  },
-  app
-);
 
 const corsOptions = {
   origin: [
@@ -96,9 +85,6 @@ app.use(tagRouter);
 app.use(logRouter);
 app.use(editorLinkMangerRouter);
 
-// server.listen(4200)
-ssl.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`server started at port ${PORT}`);
 });
-
-// io.listen(server);
