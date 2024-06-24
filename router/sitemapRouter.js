@@ -12,9 +12,11 @@ require("dotenv").config();
 let sitemap;
 const domain = process.env.DOMAIN;
 
-sitemapRouter.get("/checkUrl/:url", async function (req, res) {
+sitemapRouter.post("/checkUrl", async function (req, res) {
+
+  const url = req.body.url;
+
   try {
-    const url = decodeURIComponent(req.params.url);
     const findData = await Sitemap.findOne({ url: url }).select(
       "url originalID type -_id"
     );
