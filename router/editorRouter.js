@@ -739,7 +739,7 @@ editorRouter.get("/editor", verifyUser, parseQuery, async (req, res) => {
     // Try to get data from cache
     const generateCacheKey = (query) => {
       //避免UAT與其他專案衝突
-      let objectTypeString = "musense:editorList";
+      let objectTypeString = "pickme:editorList";
       for (const [key, value] of Object.entries(query)) {
         objectTypeString += `:${key}:${value}`;
       }

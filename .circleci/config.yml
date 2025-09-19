@@ -18,7 +18,7 @@ jobs:
       - run:
           name: Deploy to GCP Compute Engine
           command: |
-            ssh -o StrictHostKeyChecking=no $VM_USER@$VM_IP "cd /home/dino_wu/musense-api-mongo/ && sudo git pull && sudo npm install && sudo pm2 restart 0 && sudo pm2 restart 1"
+            ssh -o StrictHostKeyChecking=no $VM_USER@$VM_IP "cd /home/dino_wu/pickme-api-mongo/ && sudo git pull && sudo npm install && sudo pm2 restart 0 && sudo pm2 restart 1"
 
 workflows:
   build-and-deploy:

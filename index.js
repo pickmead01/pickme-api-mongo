@@ -24,10 +24,10 @@ const PORT = process.env.PORT || 3000;
 
 const corsOptions = {
   origin: [
-    "https://www.musense.tw",
-    "https://trend.musense.tw",
-    "https://bp.musense.tw",
-    "https://bd.musense.tw",
+    "https://www.pickme.tw",
+    "https://trend.pickme.tw",
+    "https://bp.pickme.tw",
+    "https://bd.pickme.tw",
   ],
   optionsSuccessStatus: 200, //
   credentials: true,
@@ -49,7 +49,7 @@ app.use(
       // path: userRouter,
       // maxAge: new Date(253402300000000), // Approximately Friday, 31 Dec 9999 23:59:59 GMT
       httpOnly: true,
-      domain: ".musense.tw",
+      domain: ".pickme.tw",
       expires: 43200000,
     },
     maxAge: 28800000, // Approximately Friday, 31 Dec 9999 23:59:59 GMT
@@ -63,10 +63,10 @@ app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Credentials", true);
   res.header(
     "Access-Control-Allow-Origin",
-    "https://www.musense.tw",
-    "https://trend.musense.tw",
-    "https://bp.musense.tw",
-    "https://bd.musense.tw"
+    "https://www.pickme.tw",
+    "https://trend.pickme.tw",
+    "https://bp.pickme.tw",
+    "https://bd.pickme.tw"
   );
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,PATCH");
   res.header(
