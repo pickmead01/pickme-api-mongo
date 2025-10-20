@@ -50,31 +50,13 @@ app.use(
       // maxAge: new Date(253402300000000), // Approximately Friday, 31 Dec 9999 23:59:59 GMT
       httpOnly: true,
       domain: ".pickme.tw",
-      expires: 43200000,
+      maxAge: 1000 * 60 * 60 * 8,
     },
-    maxAge: 28800000, // Approximately Friday, 31 Dec 9999 23:59:59 GMT
     saveUninitialized: false,
     resave: false, //avoid server race condition
     // store: MongoStore.create({ mongoUrl: process.env.CON_STR }),
   })
 );
-
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Credentials", true);
-  res.header(
-    "Access-Control-Allow-Origin",
-    "https://www.pickme.tw",
-    "https://trend.pickme.tw",
-    "https://bp.pickme.tw",
-    "https://bd.pickme.tw"
-  );
-  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,PATCH");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept"
-  );
-  next();
-});
 
 app.use(bannerRouter);
 app.use(sitemapRouter);
