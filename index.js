@@ -1,5 +1,11 @@
 const express = require("express");
 const cors = require("cors");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+
+require("dotenv").config();
+require("./mongoose");
+
 const tagRouter = require("./router/tagRouter");
 const editorRouter = require("./router/editorRouter");
 const userRouter = require("./router/userRouter");
@@ -8,56 +14,62 @@ const categoryRouter = require("./router/categoryRouter");
 const logRouter = require("./router/logRouter");
 const bannerRouter = require("./router/bannerRouter");
 const editorLinkMangerRouter = require("./router/editorLinkMangerRouter");
-require("dotenv").config();
-require("./mongoose");
-const session = require("express-session");
-const fs = require("fs");
-const https = require("https");
-// const io = require('socket.io')
 
 const app = express();
-// const PORT = 4200
 const PORT = process.env.PORT || 3000;
-// const CorsOrgin
-// const corsOrgin = process.env.CORS_STR || "http://localhost:4200";
-// const ssl
+
+// ✅ 修正 1：動態允許多網域 CORS
+const allowedOrigins = [
+  "https://www.pickme.tw",
+  "https://trend.pickme.tw",
+  "https://bp.pickme.tw",
+  "https://bd.pickme.tw",
+];
+
+app.set("trust proxy", 1);
 
 const corsOptions = {
-  origin: [
-    "https://www.pickme.tw",
-    "https://trend.pickme.tw",
-    "https://bp.pickme.tw",
-    "https://bd.pickme.tw",
-  ],
-  optionsSuccessStatus: 200, //
+  origin(origin, callback) {
+    // 若沒有 Origin（例如 curl），直接允許
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
-  // methods: ["GET", "POST", "PATCH", "DELETE"],
-  //some legacy browsers (IE11, various SmartTVs) choke on 204
+  optionsSuccessStatus: 200,
 };
 
-app.use(express.json());
 app.use(cors(corsOptions));
+app.use(express.json());
 
-//set session attribute
+const store = MongoStore.create({
+  mongoUrl: process.env.CON_STR,
+  mongoOptions: { serverSelectionTimeoutMS: 5000 },
+});
+store.on('connected', () => console.log("✅ MongoStore connected"));
+store.on('error', (e) => console.error("❌ MongoStore error", e));
+
+// ✅ 修正 2：Session 應放在 CORS 後、Router 前
 app.use(
   session({
     secret: process.env.SESSIONSECRETKEY,
-    // secret: crypto.randomUUID(),
-    name: "sid", // optional
+    name: "sid",
+    store,
     cookie: {
-      secure: true, //if set true only excute on https
-      // path: userRouter,
-      // maxAge: new Date(253402300000000), // Approximately Friday, 31 Dec 9999 23:59:59 GMT
       httpOnly: true,
-      domain: ".pickme.tw",
-      maxAge: 1000 * 60 * 60 * 8,
+      secure: true,         // 必須在 HTTPS 環境下
+      sameSite: "none",     // ⭐ 允許跨子網域
+      domain: ".pickme.tw", // ⭐ 共用 cookie 給 bp/bd
+      maxAge: 1000 * 60 * 60 * 8, // 8 小時
     },
     saveUninitialized: false,
-    resave: false, //avoid server race condition
-    // store: MongoStore.create({ mongoUrl: process.env.CON_STR }),
+    resave: false,
   })
 );
 
+// ✅ 修正 3：統一 router 載入順序（session 在前）
 app.use(bannerRouter);
 app.use(sitemapRouter);
 app.use(categoryRouter);
@@ -67,6 +79,7 @@ app.use(tagRouter);
 app.use(logRouter);
 app.use(editorLinkMangerRouter);
 
+// ✅ 修正 4：統一 listen 並打印 HTTPS 狀態
 app.listen(PORT, () => {
-  console.log(`server started at port ${PORT}`);
+  console.log(`✅ Server started at port ${PORT} (HTTPS ready, CORS enabled)`);
 });

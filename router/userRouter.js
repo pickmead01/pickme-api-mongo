@@ -60,6 +60,12 @@ userRouter.post("/login", async (req, res) => {
       req.session.user = user.username;
       req.session.role = user.role;
       req.session.status = user.status;
+
+      // 強制立即保存 session
+      await new Promise((resolve, reject) => {
+        req.session.save(err => (err ? reject(err) : resolve()));
+      });
+
       await logChanges(
         req.method,
         req.path,
