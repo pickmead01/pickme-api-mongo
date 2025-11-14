@@ -5,6 +5,7 @@ const MongoStore = require("connect-mongo");
 
 require("dotenv").config();
 require("./mongoose");
+const path = require("path");
 
 const tagRouter = require("./router/tagRouter");
 const editorRouter = require("./router/editorRouter");
