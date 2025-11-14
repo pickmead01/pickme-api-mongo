@@ -44,6 +44,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// 讓 uploads 成為可公開讀取的靜態路徑
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 const store = MongoStore.create({
   mongoUrl: process.env.CON_STR,
   mongoOptions: { serverSelectionTimeoutMS: 5000 },
