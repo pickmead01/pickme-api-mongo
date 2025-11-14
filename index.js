@@ -5,6 +5,7 @@ const MongoStore = require("connect-mongo");
 
 require("dotenv").config();
 require("./mongoose");
+const path = require("path");
 
 const tagRouter = require("./router/tagRouter");
 const editorRouter = require("./router/editorRouter");
@@ -68,6 +69,10 @@ app.use(
     resave: false,
   })
 );
+
+// 讓 uploads 成為可公開讀取的靜態路徑
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 
 // ✅ 修正 3：統一 router 載入順序（session 在前）
 app.use(bannerRouter);

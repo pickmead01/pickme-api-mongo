@@ -2016,8 +2016,8 @@ editorRouter.patch(
             }
           }
         } else {
-          res.editor.homeImagePath = `${LOCAL_DOMAIN}home/saved_image/homepage/${contentFilename}`;
-          res.editor.contentImagePath = `${LOCAL_DOMAIN}home/saved_image/content/${contentFilename}`;
+          res.editor.homeImagePath = `${LOCAL_DOMAIN}uploads/homepage/${contentFilename}`;
+          res.editor.contentImagePath = `${LOCAL_DOMAIN}uploads/content/${contentFilename}`;
         }
       }
       if (manualUrl !== undefined) {
@@ -2096,8 +2096,8 @@ editorRouter.patch(
           }
         }
       } else {
-        res.editor.homeImagePath = `${LOCAL_DOMAIN}home/saved_image/homepage/${contentFilename}`;
-        res.editor.contentImagePath = `${LOCAL_DOMAIN}home/saved_image/content/${contentFilename}`;
+        res.editor.homeImagePath = `${LOCAL_DOMAIN}uploads/homepage/${contentFilename}`;
+        res.editor.contentImagePath = `${LOCAL_DOMAIN}uploads/content/${contentFilename}`;
       }
     }
 
@@ -2165,7 +2165,7 @@ editorRouter.post(
             imageBlob = youtubeUrl;
           }
         } else {
-          imageBlob = `${LOCAL_DOMAIN}home/saved_image/content/${imageFilename}`;
+          imageBlob = `${LOCAL_DOMAIN}uploads/content/${imageFilename}`;
         }
       }
 
@@ -2287,8 +2287,8 @@ editorRouter.post(
               editorData.contentImagePath = contentFilename;
             }
           } else {
-            editorData.homeImagePath = `${LOCAL_DOMAIN}home/saved_image/homepage/${contentFilename}`;
-            editorData.contentImagePath = `${LOCAL_DOMAIN}home/saved_image/content/${contentFilename}`;
+            editorData.homeImagePath = `${LOCAL_DOMAIN}uploads/homepage/${contentFilename}`;
+            editorData.contentImagePath = `${LOCAL_DOMAIN}uploads/content/${contentFilename}`;
           }
         }
         const newEditor = new Editor(editorData);
@@ -2407,7 +2407,7 @@ editorRouter.post(
             editorData.contentImagePath = youtubeUrl;
           }
         } else {
-          editorData.contentImagePath = `${LOCAL_DOMAIN}home/saved_image/content/${contentFilename}`;
+          editorData.contentImagePath = `${LOCAL_DOMAIN}uploads/content/${contentFilename}`;
         }
       }
 
@@ -2511,8 +2511,8 @@ editorRouter.post(
               editorData.contentImagePath = youtubeUrl;
             }
           } else {
-            editorData.homeImagePath = `${LOCAL_DOMAIN}home/saved_image/homepage/${contentFilename}`;
-            editorData.contentImagePath = `${LOCAL_DOMAIN}home/saved_image/content/${contentFilename}`;
+            editorData.homeImagePath = `${LOCAL_DOMAIN}uploads/homepage/${contentFilename}`;
+            editorData.contentImagePath = `${LOCAL_DOMAIN}uploads/content/${contentFilename}`;
           }
         }
         const newDraft = new draftEditor(editorData);
