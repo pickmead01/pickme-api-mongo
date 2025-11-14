@@ -138,6 +138,13 @@ function uploadImage() {
 }
 
 async function processImage(file, originalFilename) {
+  console.log("🔥 processImage PATHS:", {
+    IMG_CONTENT_PATH,
+    IMG_HOMEPAGE_PATH,
+    CWD: process.cwd()
+  });
+  console.log("🔥 writing file:", originalFilename);
+
   // console.log(file);
   if (!file || !originalFilename) {
     // If there is no file or originalFilename, return null
@@ -176,6 +183,8 @@ async function processImage(file, originalFilename) {
       "-" +
       Date.now() +
       extension;
+      
+    console.log("🔥 trying to save to:", `${IMG_CONTENT_PATH}/${newFilename}`);
 
     fs.writeFileSync(
       `${BANNER_CONTENT_PATH}/${newFilename}`,
