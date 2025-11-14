@@ -611,15 +611,15 @@ function parseQuery(req, res, next) {
 }
 
 function uploadImage() {
-  const storage = multer.memoryStorage();
+  const storage = multer.memoryStorage(); // 必須用記憶體模式才能壓縮
+
   const upload = multer({
-    storage: storage,
+    storage,
     limits: {
-      fileSize: 10000000, //maximim size 10MB
-      fieldSize: 10 * 1024 * 1024,
+      fileSize: 10 * 1024 * 1024, // 10MB
     },
   });
-  // return upload.single("homeImagePath");
+
   return upload.fields([
     { name: "homeImagePath", maxCount: 1 },
     { name: "contentImagePath", maxCount: 1 },
@@ -627,56 +627,42 @@ function uploadImage() {
   ]);
 }
 
-async function processImage(file, originalFilename) {
-  // console.log(file);
-  if (!file || !originalFilename) {
-    // If there is no file or originalFilename, return null
-    return null;
-  }
-  if (file.mimetype.startsWith("text/")) {
-    return file.buffer.toString("utf-8");
-  } else if (file.mimetype.startsWith("image/")) {
-    // compress image using sharp
-    const compressedImage = await sharp(file.buffer)
-      .resize(1024, 1024, { fit: "inside", withoutEnlargement: true })
-      .toBuffer({ resolveWithObject: true, quality: 90 });
+const uploadRoot = path.join(__dirname, "..", "uploads");
 
-    const compressedImage2 = await sharp(file.buffer)
-      .resize(450, 300, { fit: "inside", withoutEnlargement: true })
-      .toBuffer({ resolveWithObject: true, quality: 70 });
+async function processImage(file, folder) {
+  if (!file) return null;
 
-    const extension = originalFilename.substring(
-      originalFilename.lastIndexOf(".")
-    );
-    const filenameWithoutExtension = originalFilename.substring(
-      0,
-      originalFilename.lastIndexOf(".")
-    );
-    const newFilename =
-      slugify(filenameWithoutExtension, {
-        replacement: "-", // replace spaces with replacement character, defaults to `-`
-        remove: /[^a-zA-Z0-9]/g, // remove characters that match regex, defaults to `undefined`
-        lower: true, // convert to lower case, defaults to `false`
-        strict: false, // strip special characters except replacement, defaults to `false`
-        trim: true, // trim leading and trailing replacement chars, defaults to `true`
-      }) +
-      "-" +
-      Date.now() +
-      extension;
+  const original = file.originalname;
+  const ext = path.extname(original);
+  const basename = path.basename(original, ext);
 
-    fs.writeFileSync(
-      `${IMG_CONTENT_PATH}/${newFilename}`,
-      compressedImage.data
-    );
-    fs.writeFileSync(
-      `${IMG_HOMEPAGE_PATH}/${newFilename}`,
-      compressedImage2.data
-    );
-    return newFilename;
-    // }
-  } else {
-    return null;
-  }
+  const filename = `${basename}-${Date.now()}${ext}`;
+
+  // 使用 sharp 壓縮
+  const bigImage = await sharp(file.buffer)
+    .resize(1024, 1024, { fit: "inside" })
+    .toBuffer();
+
+  const smallImage = await sharp(file.buffer)
+    .resize(450, 300, { fit: "inside" })
+    .toBuffer();
+
+  // 建立資料夾（如果不存在）
+  const bigDir = path.join(uploadRoot, folder);
+  const smallDir = path.join(uploadRoot, folder === "content" ? "homepage" : "content");
+
+  await fs.promises.mkdir(bigDir, { recursive: true });
+  await fs.promises.mkdir(smallDir, { recursive: true });
+
+  // 寫大圖
+  const bigPath = path.join(bigDir, filename);
+  await fs.promises.writeFile(bigPath, bigImage);
+
+  // 寫小圖
+  const smallPath = path.join(smallDir, filename);
+  await fs.promises.writeFile(smallPath, smallImage);
+
+  return filename;
 }
 
 const extractFirstParagraph = (htmlContent) => {
@@ -2016,8 +2002,8 @@ editorRouter.patch(
             }
           }
         } else {
-          res.editor.homeImagePath = `${LOCAL_DOMAIN}home/saved_image/homepage/${contentFilename}`;
-          res.editor.contentImagePath = `${LOCAL_DOMAIN}home/saved_image/content/${contentFilename}`;
+          res.editor.homeImagePath = `${LOCAL_DOMAIN}uploads/homepage/${contentFilename}`;
+          res.editor.contentImagePath = `${LOCAL_DOMAIN}uploads/content/${contentFilename}`;
         }
       }
       if (manualUrl !== undefined) {
@@ -2096,8 +2082,8 @@ editorRouter.patch(
           }
         }
       } else {
-        res.editor.homeImagePath = `${LOCAL_DOMAIN}home/saved_image/homepage/${contentFilename}`;
-        res.editor.contentImagePath = `${LOCAL_DOMAIN}home/saved_image/content/${contentFilename}`;
+        res.editor.homeImagePath = `${LOCAL_DOMAIN}uploads/homepage/${contentFilename}`;
+        res.editor.contentImagePath = `${LOCAL_DOMAIN}uploads/content/${contentFilename}`;
       }
     }
 
@@ -2287,8 +2273,8 @@ editorRouter.post(
               editorData.contentImagePath = contentFilename;
             }
           } else {
-            editorData.homeImagePath = `${LOCAL_DOMAIN}home/saved_image/homepage/${contentFilename}`;
-            editorData.contentImagePath = `${LOCAL_DOMAIN}home/saved_image/content/${contentFilename}`;
+            editorData.homeImagePath = `${LOCAL_DOMAIN}uploads/homepage/${contentFilename}`;
+            editorData.contentImagePath = `${LOCAL_DOMAIN}uploads/content/${contentFilename}`;
           }
         }
         const newEditor = new Editor(editorData);
@@ -2511,8 +2497,8 @@ editorRouter.post(
               editorData.contentImagePath = youtubeUrl;
             }
           } else {
-            editorData.homeImagePath = `${LOCAL_DOMAIN}home/saved_image/homepage/${contentFilename}`;
-            editorData.contentImagePath = `${LOCAL_DOMAIN}home/saved_image/content/${contentFilename}`;
+            editorData.homeImagePath = `${LOCAL_DOMAIN}uploads/homepage/${contentFilename}`;
+            editorData.contentImagePath = `${LOCAL_DOMAIN}uploads/content/${contentFilename}`;
           }
         }
         const newDraft = new draftEditor(editorData);
